@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Статистика сообщений</title>
+    <script type="text/javascript" th:src="@{/js/gstaticChartsLoader.js}"></script>
+    <script type="text/javascript">
+        function zeroPad(numberStr) {
+            return numberStr.padStart(2, "0");
+        }
+
+        function drawOutChart() {
+            var keys = [[${keysOut}]];
+            var val1 = [[${val1Out}]];
+            var val2 = [[${val2Out}]];
+            var title1 = 'Статистика исходящих сообщений за час';
+            var divId = 'chart_div_outbound_messages';
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Час');
+            data.addColumn('number', 'НеСпам сообщения');
+            data.addColumn('number', 'Спам сообщения');
+            for (var i = 0; i < keys.length; i++) {
+                data.addRow([zeroPad(keys[i].toString(10)) + ':00', val1[i] - val2[i], val2[i]]);
+            }
+            var options = {
+                title: title1,
+                vAxis: {
+                    title: "Количество"
+                },
+                hAxis: {
+                    title: "Час",
+                    slantedText: true, /* Enable slantedText for horizontal axis */
+                    slantedTextAngle: 90 /* Define slant Angle */
+                },
+                width: 700,
+                height: 400,
+                legend: {position: 'top', maxLines: 3},
+                bar: {groupWidth: '75%'},
+                isStacked: true,
+            };
+
+            // Instantiate and draw our chart, passing in some options.
+            var chart = new google.visualization.ColumnChart(document.getElementById(divId));
+            chart.draw(data, options);
+        }
+
+        function drawInChart() {
+            var keys = [[${keysIn}]];
+            var val1 = [[${val1In}]];
+            var val2 = [[${val2In}]];
+            var title1 = 'Статистика входящих сообщений за час';
+            var divId = 'chart_div_inbound_messages';
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Час');
+            data.addColumn('number', 'НеСпам сообщения');
+            data.addColumn('number', 'Спам сообщения');
+            for (var i = 0; i < keys.length; i++) {
+                data.addRow([zeroPad(keys[i].toString(10)) + ':00', val1[i] - val2[i], val2[i]]);
+            }
+            var options = {
+                title: title1,
+                vAxis: {
+                    title: "Количество"
+                },
+                hAxis: {
+                    title: "Час",
+                    slantedText: true, /* Enable slantedText for horizontal axis */
+                    slantedTextAngle: 90 /* Define slant Angle */
+                },
+                width: 700,
+                height: 400,
+                legend: {position: 'top', maxLines: 3},
+                bar: {groupWidth: '75%'},
+                isStacked: true,
+            };
+            // Instantiate and draw our chart, passing in some options.
+            var chart = new google.visualization.ColumnChart(document.getElementById(divId));
+            chart.draw(data, options);
+        }
+
+        function drawInPie() {
+            var inbound = [[${in}]];
+            var inboundSpam = [[${inSpam}]];
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Спам-Неспам');
+            data.addColumn('number', 'Количество');
+            data.addRows([
+                ['Не спам', inbound - inboundSpam],
+                ['Спам', inboundSpam]
+            ]);
+
+            var piechart_options = {
+                title: 'Статистика входящих сообщений за день',
+                width: 500,
+                height: 400
+            };
+            var piechart = new google.visualization.PieChart(document.getElementById('pie_div_inbound_messages'));
+            piechart.draw(data, piechart_options);
+        }
+
+        function drawOutPie() {
+            var outbound = [[${out}]];
+            var outboundSpam = [[${outSpam}]];
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Спам-Неспам');
+            data.addColumn('number', 'Количество');
+            data.addRows([
+                ['Не спам', outbound - outboundSpam],
+                ['Спам', outboundSpam]
+            ]);
+
+            var piechart_options = {
+                title: 'Статистика исходящих сообщений за день',
+                width: 500,
+                height: 400
+            };
+            var piechart = new google.visualization.PieChart(document.getElementById('pie_div_outbound_messages'));
+            piechart.draw(data, piechart_options);
+        }
+
+        // Load the Visualization API and the corechart package.
+        google.charts.load('current', {'packages': ['corechart']});
+
+
+        google.charts.setOnLoadCallback(drawInChart);
+        google.charts.setOnLoadCallback(drawOutChart);
+        google.charts.setOnLoadCallback(drawInPie);
+        google.charts.setOnLoadCallback(drawOutPie);
+        // Callback that creates and populates a data table,
+        // instantiates the pie chart, passes in the data and
+        // draws it.
+
+    </script>
+</head>
+<style>
+    h1.headline {
+        font-family: Arial;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    form.choose-date {
+        font-family: Arial;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-bottom: 20px;
+        font-size: large;
+        font-weight: bold;
+    }
+
+    table.columns1 {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    table.columns2 {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .stats {
+        text-align: center;
+    }
+
+    .stats table.list {
+        font-family: Arial;
+        border-collapse: collapse;
+        padding-left: 5px;
+        padding-right: 5px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        min-height: 150px;
+        display: inline-block;
+        list-style: none;
+        vertical-align: top;
+    }
+
+    th.nameFieldValue, th.nameFieldUser, td.fieldUser, td.fieldCount {
+        font-family: Arial;
+        border: 1px solid black;
+        padding-left: 5px;
+        padding-right: 5px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+    caption {
+        padding-bottom: 10px;
+        padding-top: 10px;
+        font-size: larger;
+        font-family: arial;
+        font-weight: bold;
+    }
+</style>
+
+<body>
+<h1 class=headline th:text="'Статистика сообщений за ' + ${date}"></h1>
+
+<form class="choose-date" th:action="@{/api/statistics}" method="get">
+    <div>
+        <label for="statistics-date">Выберите дату для просмотра статистики :</label>
+        <input type="date" th:value="${date}" name="date" id="statistics-date"/>
+        <button type="submit" class="button">Просмотр</button>
+    </div>
+</form>
+
+<table class="columns1">
+    <tr>
+        <td>
+            <div id="chart_div_inbound_messages" style="border: 1px solid #ccc"></div>
+        </td>
+        <td>
+            <div id="pie_div_inbound_messages" style="border: 1px solid #ccc"></div>
+        </td>
+    </tr>
+</table>
+<table class="columns2">
+    <tr>
+        <td>
+            <div id="chart_div_outbound_messages" style="border: 1px solid #ccc"></div>
+        </td>
+        <td>
+            <div id="pie_div_outbound_messages" style="border: 1px solid #ccc"></div>
+        </td>
+    </tr>
+</table>
+
+<div class="stats">
+    <div class="out-messages">
+        <table class="list">
+            <caption>Исходящие сообщения</caption>
+            <tr>
+                <th class="nameFieldUser">Отправитель</th>
+                <th class="nameFieldValue">Количество сообщений</th>
+            </tr>
+            <tr th:each="sender,stats : ${listUsersSentMessage}" th:if="${stats.index}<10">
+                <td class="fieldUser" th:text="${sender.key}"></td>
+                <td class="fieldCount" th:text="${sender.value}"></td>
+            </tr>
+        </table>
+
+        <table class="list">
+            <caption>Исходящие спам сообщения</caption>
+            <tr>
+                <th class="nameFieldUser">Отправитель</th>
+                <th class="nameFieldValue">Количество сообщений</th>
+            </tr>
+            <tr th:each="sender,stats : ${listUsersSentSpamMessage}" th:if="${stats.index}<10">
+                <td class="fieldUser" th:text="${sender.key}"></td>
+                <td class="fieldCount" th:text="${sender.value}"></td>
+            </tr>
+        </table>
+    </div>
+    <div class="in-messages">
+        <table class="list">
+            <caption>Входящие сообщения</caption>
+            <tr>
+                <th class="nameFieldUser">Отправитель</th>
+                <th class="nameFieldValue">Количество сообщений</th>
+            </tr>
+            <tr th:each="sender,stats : ${listUsersReceiveMessage}" th:if="${stats.index}<10">
+                <td class="fieldUser" th:text="${sender.key}"></td>
+                <td class="fieldCount" th:text="${sender.value}"></td>
+            </tr>
+        </table>
+        <table class="list">
+            <caption>Входящие спам сообщения</caption>
+            <tr>
+                <th class="nameFieldUser">Отправитель</th>
+                <th class="nameFieldValue">Количество сообщений</th>
+            </tr>
+            <tr th:each="sender,stats : ${listUsersReceiveSpamMessage}" th:if="${stats.index}<10">
+                <td class="fieldUser" th:text="${sender.key}"></td>
+                <td class="fieldCount" th:text="${sender.value}"></td>
+            </tr>
+        </table>
+    </div>
+    <div class="banned-users">
+        <table class="list">
+            <caption>Заблокированные пользователи</caption>
+            <tr>
+                <th class="nameFieldUser">Отправитель</th>
+                <th class="nameFieldValue">Дата блокировки</th>
+            </tr>
+            <tr th:each="bu : ${blockUsers}">
+                <td class="fieldUser" th:text="${bu.getSender()}"></td>
+                <td class="fieldCount" th:text="${#temporals.format(bu.getDateOfBlock(), 'dd-MM-yyyy HH:mm')}"></td>
+            </tr>
+        </table>
+    </div>
+</div>
+</body>
+</html>
